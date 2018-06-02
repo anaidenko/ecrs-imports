@@ -1,7 +1,7 @@
 {
-  "name": "ecrs-syncing",
+  "name": "ecrs-imports",
   "version": "1.0.0",
-  "description": "ERCS is used by JAX Spirits in Cumming, GA. Their POS system is set to export an XML file every 12 hours and upload to an FTP, which is collected and passed to Sellr API for importing.",
+  "description": "ECRS Imports is used by JAX Spirits in Cumming, GA. Their POS system is set to export an XML file every 12 hours and upload to an FTP, which is collected and passed to Sellr API for importing.",
   "main": "build/index.js",
   "scripts": {
     "postinstall": "gulp build",
@@ -13,14 +13,14 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/sllr/ecrs-syncing.git"
+    "url": "git+https://github.com/sllr/ecrs-imports.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/sllr/ecrs-syncing/issues"
+    "url": "https://github.com/sllr/ecrs-imports/issues"
   },
-  "homepage": "https://github.com/sllr/ecrs-syncing#readme",
+  "homepage": "https://github.com/sllr/ecrs-imports#readme",
   "devDependencies": {
     "@types/expect.js": "^0.3.29",
     "@types/mocha": "^5.2.1",
