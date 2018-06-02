@@ -1,0 +1,49 @@
+{
+  "name": "ecrs-syncing",
+  "version": "1.0.0",
+  "description": "ERCS is used by JAX Spirits in Cumming, GA. Their POS system is set to export an XML file every 12 hours and upload to an FTP, which is collected and passed to Sellr API for importing.",
+  "main": "build/index.js",
+  "scripts": {
+    "postinstall": "gulp build",
+    "dev": "gulp dev",
+    "test": "gulp test"
+  },
+  "cacheDirectories": [
+    "node_modules"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sllr/ecrs-syncing.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/sllr/ecrs-syncing/issues"
+  },
+  "homepage": "https://github.com/sllr/ecrs-syncing#readme",
+  "devDependencies": {
+    "@types/expect.js": "^0.3.29",
+    "@types/mocha": "^5.2.1",
+    "@types/node": "^10.3.0",
+    "cli-clear": "^1.0.4",
+    "del": "^3.0.0",
+    "expect.js": "^0.3.1",
+    "gulp": "^3.9.1",
+    "gulp-karma": "0.0.5",
+    "gulp-sourcemaps": "^2.6.4",
+    "gulp-tslint": "^8.1.3",
+    "gulp-typescript": "^4.0.2",
+    "karma": "^2.0.2",
+    "karma-chrome-launcher": "^2.2.0",
+    "karma-cli": "^1.0.1",
+    "karma-coverage": "^1.1.2",
+    "karma-mocha": "^1.3.0",
+    "karma-phantomjs-launcher": "^1.0.4",
+    "karma-typescript": "^3.0.12",
+    "mocha": "^5.2.0",
+    "run-sequence": "^2.2.1",
+    "tslint": "^5.10.0",
+    "tslint-config-standard": "^7.0.0",
+    "typescript": "^2.9.1"
+  }
+}
