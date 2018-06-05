@@ -9,6 +9,9 @@
     "test": "gulp test",
     "start": "node build/app.js"
   },
+  "engines": {
+    "node": "8.9.4"
+  },
   "cacheDirectories": [
     "node_modules"
   ],

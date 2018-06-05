@@ -7,8 +7,8 @@ export const Env: string = process.env['NODE_ENV'] || 'development'
 export const Timezone: string = process.env['TZ'] || 'America/New_York'
 export const Debug: boolean = process.env['DEBUG'] === 'true'
 export const FtpRoot: string = process.env['FTP_ROOT'] || '/'
-export const ApiImportUrl: string = process.env['API_IMPORT_URL'] || 'http://api.sllr.io/api/import'
-export const CronTimerInterval: string = process.env['CRON_TIMER_INTERVAL'] || '* * 6 * * *' // daily at 6am (by default)
+export const ApiImportUrl: string = process.env['API_IMPORT_URL'] || 'http://apidev.sllr.io/api/import'
+export const CronTimerInterval: string = process.env['CRON_TIMER_INTERVAL'] || '* * 6,18 * * *' // 2 times a day, at 6am and 6pm (by default)
 
 export const FtpSettings: FtpOptions = {
   host: process.env['FTP_HOST'],

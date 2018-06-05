@@ -1,0 +1,16 @@
+machine:
+  node:
+    version: 8.9.4
+deployment:
+  staging:
+    branch: staging
+    heroku:
+      appname: ecrs-imports-staging
+  develop:
+    branch: develop
+    heroku:
+      appname: ecrs-imports-dev
+  master:
+    branch: master
+    heroku:
+      appname: ecrs-imports
