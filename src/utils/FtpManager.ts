@@ -32,7 +32,10 @@ export class FtpManager {
   async connect (): Promise<void> {
     return new Promise<void>((resolve: () => void, reject: (err: Error) => void) => {
       this.client.on('error', err => reject(err))
-      this.client.on('ready', () => resolve())
+      this.client.on('ready', () => {
+        logger.debug(this.id, 'Connected')
+        resolve()
+      })
       logger.log(this.id, `Connecting to ${this.options.host}...`)
       this.client.connect(this.options as FtpClient.Options)
     })
@@ -55,8 +58,10 @@ export class FtpManager {
       this.client.on('error', reject)
       this.client.list(path, false, (error: Error, listing: FtpClient.ListingElement[]) => {
         if (error) return reject(error)
+        logger.debug(this.id, `Listings found: ${listing.length}`)
         let files = listing.map(file => this.mapFileInfo(file, path))
         if (pattern) files = files.filter(file => minimatch(file.name, pattern))
+        logger.debug(this.id, `Total files found: ${files.length}`)
         resolve(files)
       })
     })
@@ -64,6 +69,7 @@ export class FtpManager {
 
   async getContent (filepath: string): Promise<string> {
     return new Promise((resolve: (result: string) => void, reject: (err: Error) => void) => {
+      logger.debug(`Downloading file ${filepath}...`)
       this.client.on('error', reject)
       this.client.get(filepath, (error: Error, stream: ReadableStream) => {
         if (error) return reject(error)
