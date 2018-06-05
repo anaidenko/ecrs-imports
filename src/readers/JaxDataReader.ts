@@ -1,54 +1,71 @@
 import * as path from 'path'
 import * as _ from 'lodash'
 
-import { ECRSImportItem } from '../api'
-import { DataReader } from './DataReader'
-import { FtpManager, FtpOptions } from '../utils/FtpManager'
+import * as api from '../api/types'
+import logger from '../utils/logger'
+import { FtpManager, FtpOptions, FileInfo as FtpFileInfo } from '../utils/FtpManager'
 import { parseXml } from '../utils/parsers'
 
-export default class JaxDataReader implements DataReader<ECRSImportItem> {
-  private ftpManager = new FtpManager()
+export default class JaxDataReader {
+  private ftpManager: FtpManager
 
   constructor (
-    private store: { storeId: number },
+    private store: { storeId: number, accountId: number },
     private ftpOptions: FtpOptions) {
+    this.ftpManager = new FtpManager(ftpOptions)
   }
 
-  async read (): Promise<ECRSImportItem[]> {
-    await this.ftpManager.connect(this.ftpOptions)
+  async read (): Promise<api.ImportPayload | undefined> {
+    await this.ftpManager.connect()
     try {
-      let items = await this.readItems()
-      return items
+      let xmlFile = await this.lookupXmlFile()
+      if (!xmlFile) {
+        logger.log('xml file not found on FTP')
+        return undefined // not found
+      }
+      let items = await this.readItems(xmlFile.path)
+      let payload: api.ImportPayload = {
+        ...this.store,
+        items: items,
+        source: 'ECRS Imports',
+        metadata: {
+          fileName: xmlFile.name
+        }
+      } as api.ImportPayload
+      return payload
     } finally {
       await this.ftpManager.disconnect()
     }
   }
 
-  mapItem (data: any): ECRSImportItem {
-    let price: string = data.Pricing[0].Price[0].$.price
-    let item: ECRSImportItem = {
-      'Item ID': data.$.scancode,
-      'Receipt Alias': (data.ReceiptAlias || [])[0],
-      'Store': this.store.storeId.toString(), // Jax - Cumming, GA
-      'On Hand': (data.OnHand || [])[0],
-      'Base Price': '$' + price
-    }
-    return item
-  }
-
-  private async readItems (): Promise<ECRSImportItem[]> {
+  private async lookupXmlFile (): Promise<FtpFileInfo> {
     let dirpath = path.join(this.ftpOptions.root || '/', '/items')
 
     let xmlFiles = await this.ftpManager.list(dirpath, '*.xml')
     if (xmlFiles.length === 0) throw new Error('files not found')
 
-    let lastXmlFile = _.maxBy(xmlFiles, file => Number(file.name.split('.')[0]) || file.name)
-    let lastXmlFilename: string = lastXmlFile ? lastXmlFile.name : ''
+    let lastXmlFile = _.maxBy(xmlFiles, file => Number(file.name.substr(0, file.name.length - file.ext.length)) || file.date.getTime()) as FtpFileInfo
+    return lastXmlFile
+  }
 
-    let content = await this.ftpManager.getContent(path.join(dirpath, lastXmlFilename))
+  private async readItems (xmlFilePath: string): Promise<api.ECRSImportItem[]> {
+    let content = await this.ftpManager.getContent(xmlFilePath)
     let data = await parseXml(content)
-
     let items = data.Items.Item.map(data => this.mapItem(data))
     return items
+  }
+
+  private mapItem (data: any): api.ECRSImportItem {
+    let price: string = data.Pricing[0].Price[0].$.price
+    let item: api.ECRSImportItem = {
+      'Item ID': data.$.scancode,
+      'Receipt Alias': (data.ReceiptAlias || [])[0],
+      'Store': this.store.storeId.toString(), // Jax - Cumming, GA
+      'On Hand': (data.OnHand || [])[0],
+      'Base Price': '$' + price,
+      'Avg Cost': '', // missing
+      'Last Cost': '' // missing
+    }
+    return item
   }
 }
