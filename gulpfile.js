@@ -6,7 +6,8 @@ var sourcemaps = require('gulp-sourcemaps');
 var ts = require('gulp-typescript');
 var tslint = require('tslint');
 var gulpTslint = require('gulp-tslint');
-var Server = require('karma').Server;
+var KarmaServer = require('karma').Server;
+var run = require('gulp-run');
 
 var tsProject = ts.createProject('tsconfig.json');
 var program = tslint.Linter.createProgram('./tsconfig.json');
@@ -40,6 +41,19 @@ gulp.task('lint:ts', function () {
     }))
 });
 
+gulp.task('lint:ts:fix', function () {
+  return tsProject.src()
+    .pipe(gulpTslint({
+      configuration: 'tslint.json',
+      program: program,
+      formatter: 'verbose',
+      fix: true
+    }))
+    .pipe(gulpTslint.report({
+      emitError: false
+    }))
+});
+
 gulp.task('lint:ts:log', function () {
   return tsProject.src()
     .pipe(gulpTslint({
@@ -53,30 +67,39 @@ gulp.task('lint:ts:log', function () {
 });
 
 gulp.task('lint', ['lint:ts'])
+gulp.task('lint:fix', ['lint:ts:fix'])
 gulp.task('lint:log', ['lint:ts:log'])
 
 gulp.task('build', ['clean', 'scripts', 'lint'])
+gulp.task('start', function (cb) {
+  return runSequence('build', 'exec', cb);
+})
+
+gulp.task('exec', function () {
+  return run('npm start').exec()    // run "npm start".
+    .pipe(gulp.dest('output'));      // writes results to output/echo.
+})
 
 gulp.task('test', function (cb) {
-  new Server({
+  new KarmaServer({
     configFile: __dirname + '/karma.conf.js',
     singleRun: true
   }, cb).start()
 })
 
-gulp.task('tdd', function (cb) {
-  new Server({
-    configFile: __dirname + '/karma.conf.js'
-  }, cb).start()
-})
-
-gulp.task('watch', ['scripts', 'lint:log', 'tdd'], function () {
+gulp.task('watch', ['scripts', 'lint:log'], function () {
   gulp.watch('src/**/*', ['scripts', 'lint:log'])
 })
 
 gulp.task('dev', function (cb) {
   return runSequence('clear', 'clean', 'watch', cb);
-});
+})
+
+gulp.task('tdd', ['watch'], function (cb) {
+  new KarmaServer({
+    configFile: __dirname + '/karma.conf.js'
+  }, cb).start()
+})
 
 // Aliases
 

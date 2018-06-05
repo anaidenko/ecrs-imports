@@ -1,4 +1,9 @@
+var fs = require('fs');
+var stripJsonComments = require('strip-json-comments');
+
 module.exports = function (config) {
+  var tsconfig = JSON.parse(stripJsonComments(fs.readFileSync('./tsconfig.json', 'utf8')));
+
   config.set({
     frameworks: ['mocha', 'karma-typescript'],
     files: [
@@ -10,9 +15,13 @@ module.exports = function (config) {
     },
     reporters: ['progress', 'coverage', 'karma-typescript'],
     browsers: ['PhantomJS'],
+    // browsers: ['Chrome'],
     coverageReporter: {
       dir: 'coverage',
       type: 'lcov'
+    },
+    karmaTypescriptConfig: {
+      compilerOptions: tsconfig.compilerOptions
     }
   });
 };
