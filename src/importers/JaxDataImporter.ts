@@ -33,13 +33,12 @@ export default class JaxDataImporter {
   }
 
   async login () {
-    let payload = { payload: config.ApiCredentials }
+    let payload = config.ApiCredentials
     logger.log('logging into sellr api...')
     let response = await this.api.post(config.ApiAuthUrl, payload)
-    logger.debug('auth api response', response.data)
-    let token = response.data.token
-    logger.debug('auth token received', token.token)
-    this.api.defaults.headers.common['Authorization'] = `Bearer ${token.token}`
+    let token = response.data
+    logger.debug('auth token received', token)
+    this.api.defaults.headers.common['Authorization'] = `Bearer ${token}`
     return response.data
   }
 

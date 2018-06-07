@@ -9,7 +9,7 @@ export const Debug: boolean = process.env['DEBUG'] === 'true'
 export const CronTimerInterval: string = process.env['CRON_TIMER_INTERVAL'] || ''
 
 export const ApiBaseUrl: string = process.env['API_SELLR_BASE'] || 'http://apidev.sllr.io'
-export const ApiAuthUrl: string = process.env['API_AUTH_URL'] || '/users/login'
+export const ApiAuthUrl: string = process.env['API_AUTH_URL'] || '/session'
 export const ApiImportUrl: string = process.env['API_IMPORT_URL'] || '/api/import'
 
 export const ApiCredentials = {
