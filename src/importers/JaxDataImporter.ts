@@ -49,7 +49,7 @@ export default class JaxDataImporter {
       logger.debug('item', payload)
     }
     let response = await this.api.post(config.ApiImportUrl, payload)
-    logger.debug('import api response', response.data)
+    logger.debug('import api response', response.data.summary)
     logger.log(`done, imported ${payload.items.length} items`)
     return payload.items.length
   }
