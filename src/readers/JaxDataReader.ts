@@ -63,6 +63,7 @@ export default class JaxDataReader {
       upc: data.$.scancode,
       name: (data.Name || [])[0],
       inventory: (data.OnHand || [])[0],
+      size: (data.Size || [])[0],
       type: data.Department ? data.Department[0].$.name : '',
       price: price
     }
