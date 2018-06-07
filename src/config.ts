@@ -25,3 +25,8 @@ export const FtpSettings: FtpOptions = {
   root: process.env['FTP_ROOT'] || '/',
   compress: process.env['FTP_COMPRESS'] === 'true'
 }
+
+export const JaxStore = {
+  accountId: Number(process.env['JAX_ACCOUNT_ID']) || 1042,
+  storeId: Number(process.env['JAX_STORE_ID']) || 284
+}

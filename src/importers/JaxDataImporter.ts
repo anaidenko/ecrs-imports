@@ -18,7 +18,7 @@ export default class JaxDataImporter {
   async run (): Promise<number> {
     try {
       logger.log('Starting jax importer...')
-      let store = { storeId: 284, accountId: 1042 }
+      let store = config.JaxStore
       let payload = await new JaxDataReader(store, config.FtpSettings).read()
       if (!payload) return 0 // not found
       await this.login()
