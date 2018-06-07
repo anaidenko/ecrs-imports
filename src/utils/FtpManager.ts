@@ -8,6 +8,7 @@ import ReadableStream = NodeJS.ReadableStream
 
 export interface FtpOptions extends FtpClient.Options {
   root?: string
+  compress?: boolean
 }
 
 export interface FileInfo extends FtpClient.ListingElement {
@@ -36,7 +37,7 @@ export class FtpManager {
         logger.debug(this.id, 'Connected')
         resolve()
       })
-      logger.log(this.id, `Connecting to ${this.options.host}...`)
+      logger.log(this.id, `Connecting to ${this.options.user}@${this.options.host}...`)
       this.client.connect(this.options as FtpClient.Options)
     })
   }
@@ -55,13 +56,13 @@ export class FtpManager {
 
   async list (path: string, pattern?: string): Promise<FileInfo[]> {
     return new Promise((resolve: (result: FileInfo[]) => void, reject: (err: Error) => void) => {
+      logger.log(this.id, `requesting listing at ${path}...`)
       this.client.on('error', reject)
-      this.client.list(path, false, (error: Error, listing: FtpClient.ListingElement[]) => {
+      this.client.list(path, this.options.compress || false, (error: Error, listing: FtpClient.ListingElement[]) => {
         if (error) return reject(error)
-        logger.debug(this.id, `Listings found: ${listing.length}`)
         let files = listing.map(file => this.mapFileInfo(file, path))
         if (pattern) files = files.filter(file => minimatch(file.name, pattern))
-        logger.debug(this.id, `Total files found: ${files.length}`)
+        logger.debug(this.id, `total xml files found: ${files.length}`)
         resolve(files)
       })
     })
@@ -69,7 +70,7 @@ export class FtpManager {
 
   async getContent (filepath: string): Promise<string> {
     return new Promise((resolve: (result: string) => void, reject: (err: Error) => void) => {
-      logger.debug(`Downloading file ${filepath}...`)
+      logger.log(this.id, `downloading file ${filepath}...`)
       this.client.on('error', reject)
       this.client.get(filepath, (error: Error, stream: ReadableStream) => {
         if (error) return reject(error)
