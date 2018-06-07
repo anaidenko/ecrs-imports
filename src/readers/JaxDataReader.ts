@@ -58,15 +58,15 @@ export default class JaxDataReader {
 
   private mapItem (data: any): api.ECRSImportItem {
     let price: string = data.Pricing[0].Price[0].$.price
+
     let item: api.ECRSImportItem = {
-      'Item ID': data.$.scancode,
-      'Receipt Alias': (data.ReceiptAlias || [])[0],
-      'Store': this.store.storeId.toString(), // Jax - Cumming, GA
-      'On Hand': (data.OnHand || [])[0],
-      'Base Price': '$' + price,
-      'Avg Cost': '', // missing
-      'Last Cost': '' // missing
+      upc: data.$.scancode,
+      name: (data.Name || [])[0],
+      inventory: (data.OnHand || [])[0],
+      type: data.Department ? data.Department[0].$.name : '',
+      price: price
     }
+
     return item
   }
 }
