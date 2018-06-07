@@ -6,6 +6,7 @@ dotenv.config()
 export const Env: string = process.env['NODE_ENV'] || 'development'
 export const Timezone: string = process.env['TZ'] || 'America/New_York'
 export const Debug: boolean = process.env['DEBUG'] === 'true'
+export const DebugSingleItem: boolean = process.env['DEBUG_SINGLE_ITEM'] === 'true'
 export const CronTimerInterval: string = process.env['CRON_TIMER_INTERVAL'] || ''
 
 export const ApiBaseUrl: string = process.env['API_SELLR_BASE'] || 'http://apidev.sllr.io'

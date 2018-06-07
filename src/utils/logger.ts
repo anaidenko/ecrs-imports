@@ -2,7 +2,7 @@ import * as winston from 'winston'
 import * as config from '../config'
 
 const logger = new winston.Logger({
-  level: config.Env === 'development' ? 'debug' : 'info',
+  level: config.Env === 'development' || config.Debug ? 'debug' : 'info',
   transports: [
     new winston.transports.Console({
       colorize: 'level', prettyPrint: (obj: any) => {

@@ -1,3 +1,9 @@
+export interface ImportPayload {
+  accountId: number
+  storeId: number
+  items: ECRSImportItem[]
+}
+
 export type ECRSImportItem = {
   upc: string,
   name: string,

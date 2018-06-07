@@ -44,7 +44,7 @@ export default class JaxDataImporter {
 
   async submitItems (payload: api.ImportPayload): Promise<number> {
     logger.log('sending jax items over to import api...')
-    if (config.Debug) {
+    if (config.DebugSingleItem) {
       payload.items.length = 1 // trim
       logger.debug('item', payload)
     }
