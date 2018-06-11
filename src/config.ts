@@ -10,6 +10,7 @@ export const Env: string = process.env['NODE_ENV'] || 'development'
 export const Timezone: string = process.env['TZ'] || 'America/New_York'
 export const Debug: boolean = process.env['DEBUG'] === 'true'
 export const DebugSingleItem: boolean = process.env['DEBUG_SINGLE_ITEM'] === 'true'
+export const DebugRedis: boolean = process.env['DEBUG_REDIS'] === 'true'
 
 export const CronImportInterval: string = process.env['CRON_IMPORT_INTERVAL'] || ''
 export const CronCheckInterval: string = process.env['CRON_CHECK_INTERVAL'] || ''
