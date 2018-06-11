@@ -1,5 +1,8 @@
 import * as winston from 'winston'
 import * as config from '../config'
+import fs = require('fs-extra')
+
+fs.ensureDirSync('./logs')
 
 const logger = new winston.Logger({
   level: config.Env === 'development' || config.Debug ? 'debug' : 'info',
