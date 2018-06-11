@@ -103,5 +103,7 @@ gulp.task('tdd', ['watch'], function (cb) {
 
 // Aliases
 
+gulp.task('b', ['build'])
+gulp.task('s', ['start'])
 gulp.task('gulpTslint', ['lint:ts'])
 gulp.task('default', ['dev'])

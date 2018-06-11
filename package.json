@@ -7,7 +7,10 @@
     "postinstall": "bower install --config.interactive=false && gulp build",
     "dev": "gulp dev",
     "test": "echo Skipping tests...",
-    "start": "node build/app.js"
+    "start": "npm run start:app",
+    "start:app": "node build/app.js",
+    "start:clock": "node build/clock.js",
+    "start:web": "node build/web/server.js"
   },
   "engines": {
     "node": "8.9.4"
@@ -35,6 +38,7 @@
     "@types/minimatch": "^3.0.3",
     "@types/mocha": "^5.2.1",
     "@types/node": "^10.3.0",
+    "@types/redis": "^2.8.6",
     "@types/winston": "^2.3.9",
     "bower": "^1.8.4",
     "cli-clear": "^1.0.4",
@@ -72,7 +76,9 @@
     "http": "0.0.0",
     "lodash": "^4.17.10",
     "minimatch": "^3.0.4",
+    "moment": "^2.22.2",
     "morgan": "^1.9.0",
+    "redis": "^2.8.0",
     "stream-to-string": "^1.1.0",
     "winston": "^2.4.2",
     "xml2js": "^0.4.19"

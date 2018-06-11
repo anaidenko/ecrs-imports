@@ -1,4 +1,7 @@
 import * as dotenv from 'dotenv'
+import * as moment from 'moment'
+import { ClientOpts as RedisOptions } from 'redis'
+
 import { FtpOptions } from './utils/FtpManager'
 
 dotenv.config()
@@ -7,7 +10,10 @@ export const Env: string = process.env['NODE_ENV'] || 'development'
 export const Timezone: string = process.env['TZ'] || 'America/New_York'
 export const Debug: boolean = process.env['DEBUG'] === 'true'
 export const DebugSingleItem: boolean = process.env['DEBUG_SINGLE_ITEM'] === 'true'
-export const CronTimerInterval: string = process.env['CRON_TIMER_INTERVAL'] || ''
+
+export const CronImportInterval: string = process.env['CRON_IMPORT_INTERVAL'] || ''
+export const CronCheckInterval: string = process.env['CRON_CHECK_INTERVAL'] || ''
+export const CronCheckNoUpdatesDuration: moment.Duration = moment.duration(process.env['CRON_CHECK_NO_UPDATES_FOR'] || '24:00')
 
 export const ApiBaseUrl: string = process.env['API_SELLR_BASE'] || 'http://apidev.sllr.io'
 export const ApiAuthUrl: string = process.env['API_AUTH_URL'] || '/session'
@@ -24,6 +30,10 @@ export const FtpSettings: FtpOptions = {
   password: process.env['FTP_PASS'],
   root: process.env['FTP_ROOT'] || '/',
   compress: process.env['FTP_COMPRESS'] === 'true'
+}
+
+export const RedisSettings: RedisOptions = {
+  host: process.env['REDIS_URL'] || '127.0.0.1'
 }
 
 export const JaxStore = {

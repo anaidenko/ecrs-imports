@@ -3,14 +3,16 @@ import * as config from './config'
 import logger from './utils/logger'
 import JaxDataImporter from './importers/JaxDataImporter'
 
-let job: any = undefined
+let importJob: CronJob | undefined
+let checkJob: CronJob | undefined
 
-if (config.CronTimerInterval) {
-  logger.log(`Starting timer via cron: ${config.CronTimerInterval}`)
-  job = new CronJob({
-    cronTime: config.CronTimerInterval,
-    onTick: () => {
-      logger.log(`Starting scheduled jax importer on timer... ${config.CronTimerInterval}`)
+if (config.CronImportInterval) {
+  logger.log(`Starting import timer via cron: ${config.CronImportInterval}`)
+
+  importJob = new CronJob({
+    cronTime: config.CronImportInterval,
+    onTick: async () => {
+      logger.log(`Starting scheduled jax importer on timer... ${config.CronImportInterval}`)
       return new JaxDataImporter().run()
     },
     start: true,
@@ -18,4 +20,18 @@ if (config.CronTimerInterval) {
   })
 }
 
-export default job
+if (config.CronCheckInterval) {
+  logger.log(`Starting check for updates timer via cron: ${config.CronCheckInterval}`)
+
+  checkJob = new CronJob({
+    cronTime: config.CronCheckInterval,
+    onTick: async () => {
+      logger.log('Checking for updates...')
+      await new JaxDataImporter().checkForUpdates()
+    },
+    start: true,
+    timeZone: config.Timezone
+  })
+}
+
+export default { importJob, checkJob }
