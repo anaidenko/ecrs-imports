@@ -22,7 +22,9 @@
       $run.hide()
       $message.text('Running... Please wait.').load('/import', function (response, status, xhr) {
         if (status === 'error') {
-          $message.html(response)
+          $message.addClass('text-danger').html(response)
+        } else {
+          $message.addClass('text-success')
         }
       })
     })

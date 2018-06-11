@@ -177,3 +177,5 @@ cypress.json
 .env
 /build/
 /coverage/
+/logs/
+/output/
