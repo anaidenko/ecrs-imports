@@ -4,7 +4,7 @@
   "description": "ECRS Imports is used by JAX Spirits in Cumming, GA. Their POS system is set to export an XML file every 12 hours and upload to an FTP, which is collected and passed to Sellr API for importing.",
   "main": "build/app.js",
   "scripts": {
-    "postinstall": "gulp build",
+    "postinstall": "bower install --config.interactive=false && gulp build",
     "dev": "gulp dev",
     "test": "echo Skipping tests...",
     "start": "node build/app.js"
@@ -36,6 +36,7 @@
     "@types/mocha": "^5.2.1",
     "@types/node": "^10.3.0",
     "@types/winston": "^2.3.9",
+    "bower": "^1.8.4",
     "cli-clear": "^1.0.4",
     "del": "^3.0.0",
     "dotenv": "^6.0.0",

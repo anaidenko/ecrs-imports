@@ -1,10 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>ECRS Importer</title>
+  <meta charset="UTF-8">
+  <title>ECRS Importer</title>
+  <link rel="stylesheet" href="/bower_components/bootstrap/dist/css/bootstrap.min.css" />
+  <script type="text/javascript" src="/bower_components/jquery/dist/jquery.min.js"></script>
+  <script type="text/javascript" src="/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
 </head>
 <body>
-  <a href="/import" class="button">Run Importer</a>
+  <div class="m-2">
+    <a id="run" href="" class="btn btn-info">Run Importer</a>
+    <div id="message"></div>
+  </div>
+
+  <script>
+    var $run = $('#run')
+    var $message = $('#message')
+
+    $run.click(function (e) {
+      e.preventDefault()
+      $run.hide()
+      $message.text('Running... Please wait.').load('/import', function (response, status, xhr) {
+        if (status === 'error') {
+          $message.html(response)
+        }
+      })
+    })
+  </script>
 </body>
 </html>

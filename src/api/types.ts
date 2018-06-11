@@ -11,6 +11,7 @@ export type ECRSImportItem = {
   inventory: string,
   type: string,
   price: string,
+  size?: string,
   salePrice?: string,
   status?: string
 }
