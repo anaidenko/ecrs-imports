@@ -33,7 +33,7 @@ export const FtpSettings: FtpOptions = {
 }
 
 export const RedisSettings: RedisOptions = {
-  host: process.env['REDIS_URL'] || '127.0.0.1'
+  url: process.env['REDIS_URL'] || 'redis://127.0.0.1'
 }
 
 export const JaxStore = {
