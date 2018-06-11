@@ -4,10 +4,11 @@ import * as config from '../config'
 const logger = new winston.Logger({
   level: config.Env === 'development' || config.Debug ? 'debug' : 'info',
   transports: [
-    new winston.transports.Console({ colorize: 'level', prettyPrint: jsonObjects }),
+    new winston.transports.Console({ colorize: 'level', prettyPrint: jsonObjects, handleExceptions: true }),
     new winston.transports.File({ filename: './logs/errors.log', level: 'error', name: 'file.errors', json: false }),
     new winston.transports.File({ filename: './logs/all.log', level: 'verbose', name: 'file.all', json: false })
-  ]
+  ],
+  exitOnError: false
 })
 
 function jsonObjects (obj: any): string {
