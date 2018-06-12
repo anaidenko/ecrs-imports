@@ -5,10 +5,8 @@ import routes from './routes'
 
 const app = express()
 
-app.set('views', path.join(__dirname, '../../views'))
-
 app.use(morgan('dev')) // enable logger (morgan)
-app.use(express.static(path.join(__dirname, '../../views')))
+app.use(express.static(path.join(__dirname, '../../public')))
 app.use(routes)
 
 export default app

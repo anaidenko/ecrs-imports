@@ -2,6 +2,10 @@ export interface ImportPayload {
   accountId: number
   storeId: number
   items: ECRSImportItem[]
+  source: string
+  metadata: {
+    fileName: string
+  }
 }
 
 export type ECRSImportItem = {
@@ -11,6 +15,7 @@ export type ECRSImportItem = {
   inventory: string,
   type: string,
   price: string,
+  size?: string,
   salePrice?: string,
   status?: string
 }

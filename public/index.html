@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ECRS Importer</title>
+  <link rel="stylesheet" href="/libs/bootstrap/dist/css/bootstrap.min.css" />
+  <script type="text/javascript" src="/libs/jquery/dist/jquery.min.js"></script>
+  <script type="text/javascript" src="/libs/bootstrap/dist/js/bootstrap.min.js"></script>
+</head>
+<body>
+  <div class="m-2">
+    <a id="run" href="" class="btn btn-info">Run Importer</a>
+    <div id="message"></div>
+  </div>
+
+  <script>
+    var $run = $('#run')
+    var $message = $('#message')
+
+    $run.click(function (e) {
+      e.preventDefault()
+      $run.hide()
+      $message.text('Running... Please wait.').load('/import', function (response, status, xhr) {
+        if (status === 'error') {
+          $message.addClass('text-danger').html(response)
+        } else {
+          $message.addClass('text-success')
+        }
+      })
+    })
+  </script>
+</body>
+</html>

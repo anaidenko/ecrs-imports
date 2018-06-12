@@ -1,0 +1,19 @@
+{
+  "name": "ecrs-imports",
+  "description": "ECRS Imports is used by JAX Spirits in Cumming, GA. Their POS system is set to export an XML file every 12 hours and upload to an FTP, which is collected and passed to Sellr API for importing.",
+  "main": "build/web/server.js",
+  "authors": "",
+  "license": "ISC",
+  "homepage": "https://github.com/sllr/ecrs-imports",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "^3.3.1",
+    "bootstrap": "^4.1.1"
+  }
+}
