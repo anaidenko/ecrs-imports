@@ -7,6 +7,7 @@ import { FtpOptions } from './utils/FtpManager'
 dotenv.config()
 
 export const Env: string = process.env['NODE_ENV'] || 'development'
+export const Port: number = Number(process.env['PORT']) || 3000
 export const Timezone: string = process.env['TZ'] || 'America/New_York'
 export const Debug: boolean = process.env['DEBUG'] === 'true'
 export const DebugSingleItem: boolean = process.env['DEBUG_SINGLE_ITEM'] === 'true'
