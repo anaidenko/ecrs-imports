@@ -3,8 +3,12 @@ import JaxDataImporter from '../importers/JaxDataImporter'
 
 const routes = PromiseRouter()
 routes.route('/import').all(async (req, res) => {
-  let imported = await new JaxDataImporter().run()
-  res.send(`import completed for ${imported} items on ${new Date()}`)
+  try {
+    let imported = await new JaxDataImporter().import()
+    res.send(`import completed for ${imported} items on ${new Date()}`)
+  } catch (err) {
+    return res.status(500).send(err)
+  }
 })
 
 export default routes

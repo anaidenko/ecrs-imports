@@ -1,8 +1,7 @@
-import logger from './utils/logger'
 import JaxDataImporter from './importers/JaxDataImporter'
 
 async function jax () {
-  await new JaxDataImporter().run()
+  await new JaxDataImporter().import()
 }
 
-jax().catch(logger.error)
+jax().catch(() => 0)

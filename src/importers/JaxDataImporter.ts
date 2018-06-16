@@ -23,7 +23,7 @@ export default class JaxDataImporter {
     this.redis = createRedisClient()
   }
 
-  async run (): Promise<number> {
+  async import (): Promise<number> {
     try {
       logger.log('Starting jax importer...')
 
@@ -57,37 +57,6 @@ export default class JaxDataImporter {
     }
   }
 
-  async login () {
-    let payload = config.ApiCredentials
-    logger.log('logging into sellr api...')
-    let response = await this.api.post(config.ApiAuthUrl, payload)
-    let token = response.data
-    logger.debug('auth token received', token)
-    this.api.defaults.headers.common['Authorization'] = `Bearer ${token}`
-    return response.data
-  }
-
-  async submitItems (store: any, payload: api.ImportPayload): Promise<number> {
-    const storeInfo = `storeId=${store.storeId}, accountId=${store.accountId}`
-    logger.log(`sending jax items over to import api... ${storeInfo}`)
-    payload = { ...store, ...payload } as api.ImportPayload // clone object and populate with store details
-    if (config.DebugSingleItem) {
-      payload.items.length = 1 // trim
-      logger.debug('item', payload)
-    }
-    let response = await this.api.post(config.ApiImportUrl, payload)
-    logger.debug(`import api response for ${storeInfo}`, response.data.summary)
-    logger.log(`done, imported ${payload.items.length} items to ${storeInfo}`)
-    return payload.items.length
-  }
-
-  async saveImport (payload: api.ImportPayload) {
-    logger.debug('marking import as completed in redis db...')
-    await this.redis.setAsync('latestImport.timestamp', moment.utc().format())
-    await this.redis.setAsync('latestImport.filename', payload.metadata.fileName)
-    await this.redis.setAsync('latestImport.checkForUpdatesFailed', false)
-  }
-
   async checkForUpdates () {
     try {
       let checkFailed = await this.redis.getAsync('latestImport.checkForUpdatesFailed') === 'true'
@@ -101,12 +70,49 @@ export default class JaxDataImporter {
         await this.redis.setAsync('latestImport.checkForUpdatesFailed', true)
         throw new Error('No updates from ECRS for the last ' + config.CronCheckNoUpdatesDuration)
       }
+    } catch (err) {
+      logger.error('Jax Check for Updates', err)
+      throw err
     } finally {
       this.redis.quit()
     }
   }
 
-  async getLatestImport () {
+  private async login () {
+    let payload = config.ApiCredentials
+    logger.log('logging into sellr api...')
+    let response = await this.api.post(config.ApiAuthUrl, payload)
+    let token = response.data
+    logger.debug('auth token received', token)
+    this.api.defaults.headers.common['Authorization'] = `Bearer ${token}`
+    return response.data
+  }
+
+  private async submitItems (store: any, payload: api.ImportPayload): Promise<number> {
+    const storeInfo = `storeId=${store.storeId}, accountId=${store.accountId}`
+    logger.log(`sending jax items over to import api... ${storeInfo}`)
+    payload = { ...store, ...payload } as api.ImportPayload // clone object and populate with store details
+    if (config.DebugSingleItem) {
+      payload.items.length = 1 // trim
+      logger.debug('item', payload)
+    }
+    let response = await this.api.post(config.ApiImportUrl, payload).catch(err => {
+      err.message = 'Sellr API: ' + err.message
+      throw err
+    })
+    logger.debug(`import api response for ${storeInfo}`, response.data.summary)
+    logger.log(`done, imported ${payload.items.length} items to ${storeInfo}`)
+    return payload.items.length
+  }
+
+  private async saveImport (payload: api.ImportPayload) {
+    logger.debug('marking import as completed in redis db...')
+    await this.redis.setAsync('latestImport.timestamp', moment.utc().format())
+    await this.redis.setAsync('latestImport.filename', payload.metadata.fileName)
+    await this.redis.setAsync('latestImport.checkForUpdatesFailed', false)
+  }
+
+  private async getLatestImport () {
     let [filename, timestamp] = await Promise.all([
       this.redis.getAsync('latestImport.filename'),
       this.redis.getAsync('latestImport.timestamp')

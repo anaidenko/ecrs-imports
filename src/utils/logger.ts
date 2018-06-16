@@ -26,7 +26,7 @@ class Logger {
   }
 
   warn (message: any, ...params: any[]) {
-    logger.warn('warn', message, ...params)
+    logger.log('warn', message, ...params)
   }
 
   error (message: any, ...params: any[]) {

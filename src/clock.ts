@@ -13,7 +13,7 @@ if (config.CronImportInterval) {
     cronTime: config.CronImportInterval,
     onTick: async () => {
       logger.log(`Starting scheduled jax importer on timer... ${config.CronImportInterval}`)
-      return new JaxDataImporter().run()
+      return new JaxDataImporter().import().catch(() => 0)
     },
     start: true,
     timeZone: config.Timezone
@@ -27,7 +27,7 @@ if (config.CronCheckInterval) {
     cronTime: config.CronCheckInterval,
     onTick: async () => {
       logger.log('Checking for updates...')
-      await new JaxDataImporter().checkForUpdates()
+      await new JaxDataImporter().checkForUpdates().catch(() => 0)
     },
     start: true,
     timeZone: config.Timezone
