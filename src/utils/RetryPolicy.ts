@@ -20,7 +20,7 @@ export default class RetryPolicy {
       return await fn()
     } catch (err) {
       if (description) logger.warn(taskIdPrefix, description, 'failed:')
-      logger.warn(taskIdPrefix, err)
+      logger.warn(taskIdPrefix, (err.message || err).toString().replace(/Error:\s*/gi, ''))
 
       if (attempt < this.tries) {
         let retryDelay = this.delayGenerator(attempt)
