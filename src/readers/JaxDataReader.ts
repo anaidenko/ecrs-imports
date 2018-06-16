@@ -9,9 +9,7 @@ import { parseXml } from '../utils/parsers'
 export default class JaxDataReader {
   private ftpManager: FtpManager
 
-  constructor (
-    private store: { storeId: number, accountId: number },
-    private ftpOptions: FtpOptions) {
+  constructor (private ftpOptions: FtpOptions) {
     this.ftpManager = new FtpManager(ftpOptions)
   }
 
@@ -25,7 +23,6 @@ export default class JaxDataReader {
       }
       let items = await this.readItems(xmlFile.path)
       let payload: api.ImportPayload = {
-        ...this.store,
         items: items,
         source: 'ECRS Imports',
         metadata: {

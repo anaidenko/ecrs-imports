@@ -1,6 +1,6 @@
 export interface ImportPayload {
-  accountId: number
-  storeId: number
+  accountId?: number
+  storeId?: number
   items: ECRSImportItem[]
   source: string
   metadata: {

@@ -37,8 +37,3 @@ export const FtpSettings: FtpOptions = {
 export const RedisSettings: RedisOptions = {
   url: process.env['REDIS_URL'] || 'redis://127.0.0.1'
 }
-
-export const JaxStore = {
-  accountId: Number(process.env['JAX_ACCOUNT_ID']) || 1042,
-  storeId: Number(process.env['JAX_STORE_ID']) || 284
-}
