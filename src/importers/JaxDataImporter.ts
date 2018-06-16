@@ -29,14 +29,20 @@ export default class JaxDataImporter {
 
       let account = { accountId: 1042 }
       let storeCumming = { ...account, storeId: 284 }
+      let storeBraselton = { ...account, storeId: 656 }
 
       let payload = await this.retry.start(() => new JaxDataReader(config.FtpSettings).read(), 'download xml file') as api.ImportPayload
       if (!payload) return 0 // not found
 
       await this.login()
 
+      // run imports in parallel
+      logger.debug('starting imports...')
       // let storeCummingImport = this.retry.start(() => Promise.reject('fake error for cumming store'), 'submit to JAX Cumming store')
-      await new RetryPolicy(3).start(() => this.submitItems(storeCumming, payload), 'submit to JAX Cumming store')
+      // let storeBraseltonImport = this.retry.start(() => Promise.reject('fake error for braselton store'), 'submit to JAX Braselton store')
+      let storeCummingImport = this.retry.start(() => this.submitItems(storeCumming, payload), 'submit to JAX Cumming store')
+      let storeBraseltonImport = this.retry.start(() => this.submitItems(storeBraselton, payload), 'submit to JAX Braselton store')
+      await Promise.all([storeCummingImport, storeBraseltonImport])
 
       await this.saveImport(payload)
 
