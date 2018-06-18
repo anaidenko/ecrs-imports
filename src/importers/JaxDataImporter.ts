@@ -59,6 +59,8 @@ export default class JaxDataImporter {
 
   async checkForUpdates () {
     try {
+      if (config.CronCheckNoUpdatesDuration.valueOf() === 0) return
+
       let checkFailed = await this.redis.getAsync('latestImport.checkForUpdatesFailed') === 'true'
       if (checkFailed) return // already reported
 
@@ -68,7 +70,7 @@ export default class JaxDataImporter {
       let timePassed = moment.duration(moment().diff(latestImport.timestamp))
       if (timePassed > config.CronCheckNoUpdatesDuration) {
         await this.redis.setAsync('latestImport.checkForUpdatesFailed', true)
-        throw new Error('No updates from ECRS for the last ' + config.CronCheckNoUpdatesDuration)
+        throw new Error(`No updates from ECRS for the last ${config.CronCheckNoUpdatesDuration.asHours()} hours`)
       }
     } catch (err) {
       logger.error('Jax Check for Updates', err)
