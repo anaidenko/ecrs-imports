@@ -9,11 +9,11 @@ import { parseXml } from '../core/parsers'
 export default class JaxDataReader {
   private ftpManager: FtpManager
 
-  constructor (private ftpOptions: FtpOptions) {
+  constructor(private ftpOptions: FtpOptions) {
     this.ftpManager = new FtpManager(ftpOptions)
   }
 
-  async read (): Promise<api.ImportPayload | undefined> {
+  async read(): Promise<api.ImportPayload | undefined> {
     await this.ftpManager.connect()
     try {
       let xmlFile = await this.lookupXmlFile()
@@ -35,7 +35,7 @@ export default class JaxDataReader {
     }
   }
 
-  private async lookupXmlFile (): Promise<FtpFileInfo> {
+  private async lookupXmlFile(): Promise<FtpFileInfo> {
     let dirpath = path.join(this.ftpOptions.root || '/', '/items')
 
     let xmlFiles = await this.ftpManager.list(dirpath, '*.xml')
@@ -45,7 +45,7 @@ export default class JaxDataReader {
     return lastXmlFile
   }
 
-  private async readItems (xmlFilePath: string): Promise<api.ECRSImportItem[]> {
+  private async readItems(xmlFilePath: string): Promise<api.ECRSImportItem[]> {
     let content = await this.ftpManager.getContent(xmlFilePath)
     let data = await parseXml(content)
     logger.debug('mapping jax->sellr items...')
@@ -53,7 +53,7 @@ export default class JaxDataReader {
     return items
   }
 
-  private mapItem (data: any): api.ECRSImportItem {
+  private mapItem(data: any): api.ECRSImportItem {
     let price: string = data.Pricing[0].Price[0].$.price
 
     let item: api.ECRSImportItem = {

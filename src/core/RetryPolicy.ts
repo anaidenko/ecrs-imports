@@ -5,16 +5,16 @@ let taskCounter = 0 // for logging purposes
 export default class RetryPolicy {
   private delayGenerator: (attempt: number) => number
 
-  constructor (private tries: number) {
+  constructor(private tries: number) {
     // this.delayGenerator = this.linearDelayTime // for debugging only
     this.delayGenerator = this.expoDelayTime
   }
 
-  operation<T = any> (fn: () => Promise<T>, description?: string): Promise<T> {
+  operation<T = any>(fn: () => Promise<T>, description?: string): Promise<T> {
     return this.start(fn, 1, ++taskCounter, description)
   }
 
-  private async start<T = any> (fn: () => Promise<T>, attempt: number, taskId: number, description?: string): Promise<T> {
+  private async start<T = any>(fn: () => Promise<T>, attempt: number, taskId: number, description?: string): Promise<T> {
     let taskIdPrefix = `[${taskId}]`
     try {
       return await fn()
@@ -36,19 +36,19 @@ export default class RetryPolicy {
     }
   }
 
-  private async delay (duration) {
+  private async delay(duration) {
     return new Promise((resolve: () => void) => {
       setTimeout(resolve, duration)
     })
   }
 
   // tslint:disable-next-line:no-unused-variable
-  private expoDelayTime (attempt: number): number {
+  private expoDelayTime(attempt: number): number {
     return 1000 * Math.pow(attempt, 2) // exponential delay... 1sec, 4sec, 9sec, 16sec...
   }
 
   // tslint:disable-next-line:no-unused-variable
-  private linearDelayTime (attempt: number): number {
+  private linearDelayTime(attempt: number): number {
     return 1000 * attempt // linear delay... 1sec, 2sec, 3sec...
   }
 }

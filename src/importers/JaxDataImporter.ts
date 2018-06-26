@@ -8,7 +8,7 @@ import JaxDataReader from '../readers/JaxDataReader'
 import logger from '../core/logger'
 import { RedisClient, createRedisClient } from '../core/redis'
 import RetryPolicy from '../core/RetryPolicy'
-import AggregateError from '../core/AggregateError';
+import AggregateError from '../core/AggregateError'
 import { everyPromise } from '../core/promise-extra'
 
 export default class JaxDataImporter {
@@ -16,13 +16,13 @@ export default class JaxDataImporter {
   private retry: RetryPolicy
   private redis: RedisClient
 
-  constructor () {
+  constructor() {
     this.api = new api.Client()
     this.retry = new RetryPolicy(3) // times
     this.redis = createRedisClient()
   }
 
-  async import (): Promise<number> {
+  async import(): Promise<number> {
     try {
       logger.log('Starting jax importer...')
 
@@ -30,7 +30,7 @@ export default class JaxDataImporter {
       let storeCumming: api.Store = { ...account, storeId: 284 }
       let storeBraselton: api.Store = { ...account, storeId: 656 }
 
-      let data = await this.retry.operation(() => new JaxDataReader(config.FtpSettings).read(), 'download xml file') as api.ImportPayload
+      let data = (await this.retry.operation(() => new JaxDataReader(config.FtpSettings).read(), 'download xml file')) as api.ImportPayload
       if (!data || !data.items || data.items.length === 0) return 0 // not found
 
       await this.api.login()
@@ -45,10 +45,7 @@ export default class JaxDataImporter {
       //   this.retry.operation(() => Promise.reject('fake error for braselton store'), 'submit to JAX Braselton store')
       // ])
 
-      await everyPromise([
-        this.submitUpdates(storeCumming, storeCummingPayload),
-        this.submitUpdates(storeBraselton, storeBraseltonPayload)
-      ]);
+      await everyPromise([this.submitUpdates(storeCumming, storeCummingPayload), this.submitUpdates(storeBraselton, storeBraseltonPayload)])
 
       await this.saveImport(data)
 
@@ -70,18 +67,18 @@ export default class JaxDataImporter {
     }
   }
 
-  async submitUpdates (store: api.Store, payload: api.ImportPayload): Promise<number> {
+  async submitUpdates(store: api.Store, payload: api.ImportPayload): Promise<number> {
     let existingProducts = await this.retry.operation(() => this.api.fetchStoreProducts(store), 'fetch store products')
     this.mergeProductDetails(payload.items, existingProducts)
     let updated = await this.retry.operation(() => this.api.submitItems(payload), 'submit ECRS items to sellr api')
     return updated
   }
 
-  async checkForUpdates () {
+  async checkForUpdates() {
     try {
       if (config.CronCheckNoUpdatesDuration.valueOf() === 0) return
 
-      let checkFailed = await this.redis.getAsync('latestImport.checkForUpdatesFailed') === 'true'
+      let checkFailed = (await this.redis.getAsync('latestImport.checkForUpdatesFailed')) === 'true'
       if (checkFailed) return // already reported
 
       let latestImport = await this.getLatestImport()
@@ -100,7 +97,7 @@ export default class JaxDataImporter {
     }
   }
 
-  private mergeProductDetails (importProducts: api.ImportItem[], existingProducts: api.StoreProduct[]) {
+  private mergeProductDetails(importProducts: api.ImportItem[], existingProducts: api.StoreProduct[]) {
     _.each(existingProducts, existing => {
       let importProduct = _.find(importProducts, { upc: existing.upc }) as api.ECRSImportItem
       if (importProduct) {
@@ -108,30 +105,27 @@ export default class JaxDataImporter {
       }
     })
     _.each(importProducts, product => {
-      product.status = product.status || "listed" // by default
+      product.status = product.status || 'listed' // by default
     })
   }
 
-  private async saveImport (payload: api.ImportPayload) {
+  private async saveImport(payload: api.ImportPayload) {
     logger.debug('marking import as completed in redis db...')
     await this.redis.setAsync('latestImport.timestamp', moment.utc().format())
     await this.redis.setAsync('latestImport.filename', payload.metadata.fileName)
     await this.redis.setAsync('latestImport.checkForUpdatesFailed', false)
   }
 
-  private async getLatestImport () {
-    let [filename, timestamp] = await Promise.all([
-      this.redis.getAsync('latestImport.filename'),
-      this.redis.getAsync('latestImport.timestamp')
-    ])
+  private async getLatestImport() {
+    let [filename, timestamp] = await Promise.all([this.redis.getAsync('latestImport.filename'), this.redis.getAsync('latestImport.timestamp')])
     if (!timestamp) return undefined
     timestamp = moment(timestamp)
     return { filename, timestamp }
   }
 
-  private preparePayload (store: api.Store, data: api.ImportPayload): api.ImportPayload {
-    let payload = { ...store, ...data } as api.ImportPayload;
-    payload.items = _.cloneDeep(payload.items);
+  private preparePayload(store: api.Store, data: api.ImportPayload): api.ImportPayload {
+    let payload = { ...store, ...data } as api.ImportPayload
+    payload.items = _.cloneDeep(payload.items)
     return payload
   }
 }

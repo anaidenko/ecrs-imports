@@ -15,26 +15,26 @@ const logger = new winston.Logger({
   exitOnError: false
 })
 
-function jsonObjects (obj: any): string {
+function jsonObjects(obj: any): string {
   let json = JSON.stringify(obj)
   if (json.length > 200) json = JSON.stringify(obj, null, 2) // prettify
   return json
 }
 
 class Logger {
-  log (message: any, ...params: any[]) {
+  log(message: any, ...params: any[]) {
     logger.log('info', message, ...params)
   }
 
-  warn (message: any, ...params: any[]) {
+  warn(message: any, ...params: any[]) {
     logger.log('warn', message, ...params)
   }
 
-  error (message: any, ...params: any[]) {
+  error(message: any, ...params: any[]) {
     logger.log('error', message, ...params)
   }
 
-  debug (message: any, ...params: any[]) {
+  debug(message: any, ...params: any[]) {
     logger.log('debug', message, ...params)
   }
 }

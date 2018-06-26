@@ -24,13 +24,13 @@ export class FtpManager {
   private client: FtpClient
   private _id: number
 
-  constructor (private options: FtpOptions) {
+  constructor(private options: FtpOptions) {
     this._id = ++FtpManager.lastId
     this.client = new FtpClient()
-    this.client.on('error', (err) => logger.error(this.id, 'Error', err))
+    this.client.on('error', err => logger.error(this.id, 'Error', err))
   }
 
-  async connect (): Promise<void> {
+  async connect(): Promise<void> {
     return new Promise<void>((resolve: () => void, reject: (err: Error) => void) => {
       this.client.on('error', err => reject(err))
       this.client.on('ready', () => {
@@ -42,7 +42,7 @@ export class FtpManager {
     })
   }
 
-  async disconnect (force: boolean = false): Promise<void> {
+  async disconnect(force: boolean = false): Promise<void> {
     return new Promise<void>((resolve: () => void, reject: (err: Error) => void) => {
       this.client.on('error', err => reject(err))
       this.client.on('close', () => {
@@ -54,7 +54,7 @@ export class FtpManager {
     })
   }
 
-  async list (path: string, pattern?: string): Promise<FileInfo[]> {
+  async list(path: string, pattern?: string): Promise<FileInfo[]> {
     return new Promise((resolve: (result: FileInfo[]) => void, reject: (err: Error) => void) => {
       logger.log(this.id, `requesting listing at ${path}...`)
       this.client.on('error', reject)
@@ -68,7 +68,7 @@ export class FtpManager {
     })
   }
 
-  async getContent (filepath: string): Promise<string> {
+  async getContent(filepath: string): Promise<string> {
     return new Promise((resolve: (result: string) => void, reject: (err: Error) => void) => {
       logger.log(this.id, `downloading file ${filepath}...`)
       this.client.on('error', reject)
@@ -79,12 +79,12 @@ export class FtpManager {
     })
   }
 
-  private get id (): string {
+  private get id(): string {
     // if (FtpManager.lastId === 1) return 'FTP'
     return `FTP [${this._id}]`
   }
 
-  private mapFileInfo (listing: FtpClient.ListingElement, dirpath: string): FileInfo {
+  private mapFileInfo(listing: FtpClient.ListingElement, dirpath: string): FileInfo {
     let ftpSettings: FtpOptions = this.options
     let file = {
       ...listing,

@@ -7,14 +7,14 @@ import logger from '../core/logger'
 export class Client {
   private api: AxiosInstance
 
-  constructor () {
+  constructor() {
     this.api = axios.create({
       baseURL: config.ApiBaseUrl,
       timeout: 2 * 60 * 1000 // 2min
     })
   }
 
-  async login () {
+  async login() {
     let payload = config.ApiCredentials
     logger.log('logging into sellr api...')
     let response = await this.api.post(config.ApiAuthUrl, payload)
@@ -24,7 +24,7 @@ export class Client {
     return response.data
   }
 
-  async submitItems (payload: api.ImportPayload): Promise<number> {
+  async submitItems(payload: api.ImportPayload): Promise<number> {
     const storeInfo = `storeId=${payload.storeId}, accountId=${payload.accountId}`
     logger.log(`sending jax items over to import api... ${storeInfo}`)
     if (config.DebugSingleItem) {
@@ -40,7 +40,7 @@ export class Client {
     return payload.items.length
   }
 
-  async fetchStoreProducts (store: api.Store): Promise<api.StoreProduct[]> {
+  async fetchStoreProducts(store: api.Store): Promise<api.StoreProduct[]> {
     const storeInfo = `storeId=${store.storeId}, accountId=${store.accountId}`
     logger.log(`fetching jax items from store api... ${storeInfo}`)
     let url = config.ApiFetchUrl + '?id=' + store.storeId
@@ -49,5 +49,4 @@ export class Client {
     logger.debug(`Received ${products.length} products`)
     return products
   }
-
 }
