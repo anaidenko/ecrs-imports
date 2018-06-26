@@ -1,6 +1,6 @@
 import { CronJob } from 'cron'
 import * as config from './config'
-import logger from './utils/logger'
+import logger from './core/logger'
 import JaxDataImporter from './importers/JaxDataImporter'
 
 let importJob: CronJob | undefined

@@ -5,12 +5,14 @@
   "main": "build/app.js",
   "scripts": {
     "postinstall": "bower install --config.interactive=false && gulp build",
+    "build": "gulp build",
     "dev": "gulp dev",
     "test": "echo Skipping tests...",
     "start": "npm run start:app",
     "start:app": "node build/app.js",
     "start:clock": "node build/clock.js",
-    "start:web": "node build/web/server.js"
+    "start:web": "node build/web/server.js",
+    "lint-check": "tslint-config-prettier-check ./tslint.json"
   },
   "engines": {
     "node": "8.9.4"
@@ -60,9 +62,11 @@
     "karma-phantomjs-launcher": "^1.0.4",
     "karma-typescript": "^3.0.12",
     "mocha": "^5.2.0",
+    "prettier": "^1.13.5",
     "run-sequence": "^2.2.1",
     "strip-json-comments": "^2.0.1",
     "tslint": "^5.10.0",
+    "tslint-config-prettier": "^1.13.0",
     "tslint-config-standard": "^7.0.0",
     "typescript": "^2.9.1"
   },

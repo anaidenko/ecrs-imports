@@ -1,24 +1,23 @@
-import axios, { AxiosInstance } from 'axios'
 import * as moment from 'moment'
+import * as _ from 'lodash'
 
 import * as config from '../config'
-import * as api from '../api/types'
+import * as api from '../api'
 
 import JaxDataReader from '../readers/JaxDataReader'
-import logger from '../utils/logger'
-import { RedisClient, createRedisClient } from '../utils/redis'
-import RetryPolicy from '../utils/RetryPolicy'
+import logger from '../core/logger'
+import { RedisClient, createRedisClient } from '../core/redis'
+import RetryPolicy from '../core/RetryPolicy'
+import AggregateError from '../core/AggregateError';
+import { everyPromise } from '../core/promise-extra'
 
 export default class JaxDataImporter {
-  private api: AxiosInstance
+  private api: api.Client
   private retry: RetryPolicy
   private redis: RedisClient
 
   constructor () {
-    this.api = axios.create({
-      baseURL: config.ApiBaseUrl,
-      timeout: 2 * 60 * 1000 // 2min
-    })
+    this.api = new api.Client()
     this.retry = new RetryPolicy(3) // times
     this.redis = createRedisClient()
   }
@@ -28,33 +27,54 @@ export default class JaxDataImporter {
       logger.log('Starting jax importer...')
 
       let account = { accountId: 1042 }
-      let storeCumming = { ...account, storeId: 284 }
-      let storeBraselton = { ...account, storeId: 656 }
+      let storeCumming: api.Store = { ...account, storeId: 284 }
+      let storeBraselton: api.Store = { ...account, storeId: 656 }
 
-      let payload = await this.retry.start(() => new JaxDataReader(config.FtpSettings).read(), 'download xml file') as api.ImportPayload
-      if (!payload) return 0 // not found
+      let data = await this.retry.operation(() => new JaxDataReader(config.FtpSettings).read(), 'download xml file') as api.ImportPayload
+      if (!data || !data.items || data.items.length === 0) return 0 // not found
 
-      await this.login()
+      await this.api.login()
 
       // run imports in parallel
       logger.debug('starting imports...')
-      // let storeCummingImport = this.retry.start(() => Promise.reject('fake error for cumming store'), 'submit to JAX Cumming store')
-      // let storeBraseltonImport = this.retry.start(() => Promise.reject('fake error for braselton store'), 'submit to JAX Braselton store')
-      let storeCummingImport = this.retry.start(() => this.submitItems(storeCumming, payload), 'submit to JAX Cumming store')
-      let storeBraseltonImport = this.retry.start(() => this.submitItems(storeBraselton, payload), 'submit to JAX Braselton store')
-      await Promise.all([storeCummingImport, storeBraseltonImport])
+      let storeCummingPayload = this.preparePayload(storeCumming, data)
+      let storeBraseltonPayload = this.preparePayload(storeBraselton, data)
 
-      await this.saveImport(payload)
+      // await everyPromise([
+      //   this.retry.operation(() => Promise.reject('fake error for cumming store'), 'submit to JAX Cumming store'),
+      //   this.retry.operation(() => Promise.reject('fake error for braselton store'), 'submit to JAX Braselton store')
+      // ])
+
+      await everyPromise([
+        this.submitUpdates(storeCumming, storeCummingPayload),
+        this.submitUpdates(storeBraselton, storeBraseltonPayload)
+      ]);
+
+      await this.saveImport(data)
 
       logger.log('Finished jax importer successfully')
-      return payload.items.length
+      return data.items.length
     } catch (err) {
-      logger.error('Jax Import', err)
+      if (err instanceof AggregateError && err.errors.length > 0) {
+        _.each(err.errors, innerErr => {
+          logger.error('Jax Import', innerErr)
+        })
+      } else {
+        logger.error('Jax Import', err)
+      }
+
       logger.log('Finished jax importer with exception')
       throw err
     } finally {
       this.redis.quit()
     }
+  }
+
+  async submitUpdates (store: api.Store, payload: api.ImportPayload): Promise<number> {
+    let existingProducts = await this.retry.operation(() => this.api.fetchStoreProducts(store), 'fetch store products')
+    this.mergeProductDetails(payload.items, existingProducts)
+    let updated = await this.retry.operation(() => this.api.submitItems(payload), 'submit ECRS items to sellr api')
+    return updated
   }
 
   async checkForUpdates () {
@@ -80,31 +100,16 @@ export default class JaxDataImporter {
     }
   }
 
-  private async login () {
-    let payload = config.ApiCredentials
-    logger.log('logging into sellr api...')
-    let response = await this.api.post(config.ApiAuthUrl, payload)
-    let token = response.data
-    logger.debug('auth token received', token)
-    this.api.defaults.headers.common['Authorization'] = `Bearer ${token}`
-    return response.data
-  }
-
-  private async submitItems (store: any, payload: api.ImportPayload): Promise<number> {
-    const storeInfo = `storeId=${store.storeId}, accountId=${store.accountId}`
-    logger.log(`sending jax items over to import api... ${storeInfo}`)
-    payload = { ...store, ...payload } as api.ImportPayload // clone object and populate with store details
-    if (config.DebugSingleItem) {
-      payload.items.length = 1 // trim
-      logger.debug('item', payload)
-    }
-    let response = await this.api.post(config.ApiImportUrl, payload).catch(err => {
-      err.message = 'Sellr API: ' + err.message
-      throw err
+  private mergeProductDetails (importProducts: api.ImportItem[], existingProducts: api.StoreProduct[]) {
+    _.each(existingProducts, existing => {
+      let importProduct = _.find(importProducts, { upc: existing.upc }) as api.ECRSImportItem
+      if (importProduct) {
+        importProduct.status = existing.status || importProduct.status // preserve product status from sellr store
+      }
     })
-    logger.debug(`import api response for ${storeInfo}`, response.data.summary)
-    logger.log(`done, imported ${payload.items.length} items to ${storeInfo}`)
-    return payload.items.length
+    _.each(importProducts, product => {
+      product.status = product.status || "listed" // by default
+    })
   }
 
   private async saveImport (payload: api.ImportPayload) {
@@ -122,5 +127,11 @@ export default class JaxDataImporter {
     if (!timestamp) return undefined
     timestamp = moment(timestamp)
     return { filename, timestamp }
+  }
+
+  private preparePayload (store: api.Store, data: api.ImportPayload): api.ImportPayload {
+    let payload = { ...store, ...data } as api.ImportPayload;
+    payload.items = _.cloneDeep(payload.items);
+    return payload
   }
 }

@@ -1,6 +1,7 @@
 import * as express from 'express'
-import morgan = require('morgan')
+import * as morgan from 'morgan'
 import * as path from 'path'
+
 import routes from './routes'
 
 const app = express()

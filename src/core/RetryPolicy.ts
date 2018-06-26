@@ -10,11 +10,11 @@ export default class RetryPolicy {
     this.delayGenerator = this.expoDelayTime
   }
 
-  start (fn: () => Promise<any>, description?: string): Promise<any> {
-    return this.startPromise(fn, 1, ++taskCounter, description)
+  operation<T = any> (fn: () => Promise<T>, description?: string): Promise<T> {
+    return this.start(fn, 1, ++taskCounter, description)
   }
 
-  private async startPromise (fn: () => Promise<any>, attempt: number, taskId: number, description?: string): Promise<any> {
+  private async start<T = any> (fn: () => Promise<T>, attempt: number, taskId: number, description?: string): Promise<T> {
     let taskIdPrefix = `[${taskId}]`
     try {
       return await fn()
@@ -29,7 +29,7 @@ export default class RetryPolicy {
         logger.log(taskIdPrefix, `retry scheduled in ${retryDelay}ms...`)
         await this.delay(retryDelay)
         logger.log(taskIdPrefix, `retrying... attempt #${nextAttempt} to ${description}`)
-        await this.startPromise(fn, nextAttempt, taskId, description)
+        return this.start<T>(fn, nextAttempt, taskId, description)
       } else {
         throw err // reject
       }

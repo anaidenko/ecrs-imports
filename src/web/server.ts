@@ -1,4 +1,4 @@
-import http = require('http')
+import * as http from 'http'
 import app from './express'
 import * as config from '../config'
 

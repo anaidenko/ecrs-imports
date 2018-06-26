@@ -2,9 +2,9 @@ import * as path from 'path'
 import * as _ from 'lodash'
 
 import * as api from '../api/types'
-import logger from '../utils/logger'
-import { FtpManager, FtpOptions, FileInfo as FtpFileInfo } from '../utils/FtpManager'
-import { parseXml } from '../utils/parsers'
+import logger from '../core/logger'
+import { FtpManager, FtpOptions, FileInfo as FtpFileInfo } from '../core/FtpManager'
+import { parseXml } from '../core/parsers'
 
 export default class JaxDataReader {
   private ftpManager: FtpManager
