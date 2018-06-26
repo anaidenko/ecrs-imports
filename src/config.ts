@@ -2,7 +2,7 @@ import * as dotenv from 'dotenv'
 import * as moment from 'moment'
 import { ClientOpts as RedisOptions } from 'redis'
 
-import { FtpOptions } from './utils/FtpManager'
+import { FtpOptions } from './core/FtpManager'
 
 dotenv.config()
 
@@ -15,11 +15,14 @@ export const DebugRedis: boolean = process.env['DEBUG_REDIS'] === 'true'
 
 export const CronImportInterval: string = process.env['CRON_IMPORT_INTERVAL'] || ''
 export const CronCheckInterval: string = process.env['CRON_CHECK_INTERVAL'] || ''
-export const CronCheckNoUpdatesDuration: moment.Duration = moment.duration(process.env['CRON_CHECK_NO_UPDATES_FOR'] || '24:00')
+export const CronCheckNoUpdatesDuration: moment.Duration = moment.duration(
+  process.env['CRON_CHECK_NO_UPDATES_FOR'] || '24:00'
+)
 
 export const ApiBaseUrl: string = process.env['API_SELLR_BASE'] || 'http://apidev.sllr.io'
 export const ApiAuthUrl: string = process.env['API_AUTH_URL'] || '/session'
 export const ApiImportUrl: string = process.env['API_IMPORT_URL'] || '/api/import'
+export const ApiFetchUrl: string = process.env['API_FETCH_URL'] || '/storedb/stores/products'
 
 export const ApiCredentials = {
   email: process.env['API_EMAIL'],

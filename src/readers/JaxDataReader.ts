@@ -2,18 +2,18 @@ import * as path from 'path'
 import * as _ from 'lodash'
 
 import * as api from '../api/types'
-import logger from '../utils/logger'
-import { FtpManager, FtpOptions, FileInfo as FtpFileInfo } from '../utils/FtpManager'
-import { parseXml } from '../utils/parsers'
+import logger from '../core/logger'
+import { FtpManager, FtpOptions, FileInfo as FtpFileInfo } from '../core/FtpManager'
+import { parseXml } from '../core/parsers'
 
 export default class JaxDataReader {
   private ftpManager: FtpManager
 
-  constructor (private ftpOptions: FtpOptions) {
+  constructor(private ftpOptions: FtpOptions) {
     this.ftpManager = new FtpManager(ftpOptions)
   }
 
-  async read (): Promise<api.ImportPayload | undefined> {
+  async read(): Promise<api.ImportPayload | undefined> {
     await this.ftpManager.connect()
     try {
       let xmlFile = await this.lookupXmlFile()
@@ -28,24 +28,27 @@ export default class JaxDataReader {
         metadata: {
           fileName: xmlFile.name
         }
-      } as api.ImportPayload
+      }
       return payload
     } finally {
       await this.ftpManager.disconnect()
     }
   }
 
-  private async lookupXmlFile (): Promise<FtpFileInfo> {
+  private async lookupXmlFile(): Promise<FtpFileInfo> {
     let dirpath = path.join(this.ftpOptions.root || '/', '/items')
 
     let xmlFiles = await this.ftpManager.list(dirpath, '*.xml')
     if (xmlFiles.length === 0) throw new Error('files not found')
 
-    let lastXmlFile = _.maxBy(xmlFiles, file => Number(file.name.substr(0, file.name.length - file.ext.length)) || file.date.getTime()) as FtpFileInfo
+    let lastXmlFile = _.maxBy(
+      xmlFiles,
+      file => Number(file.name.substr(0, file.name.length - file.ext.length)) || file.date.getTime()
+    ) as FtpFileInfo
     return lastXmlFile
   }
 
-  private async readItems (xmlFilePath: string): Promise<api.ECRSImportItem[]> {
+  private async readItems(xmlFilePath: string): Promise<api.ECRSImportItem[]> {
     let content = await this.ftpManager.getContent(xmlFilePath)
     let data = await parseXml(content)
     logger.debug('mapping jax->sellr items...')
@@ -53,7 +56,7 @@ export default class JaxDataReader {
     return items
   }
 
-  private mapItem (data: any): api.ECRSImportItem {
+  private mapItem(data: any): api.ECRSImportItem {
     let price: string = data.Pricing[0].Price[0].$.price
 
     let item: api.ECRSImportItem = {

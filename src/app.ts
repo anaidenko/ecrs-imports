@@ -1,6 +1,6 @@
 import JaxDataImporter from './importers/JaxDataImporter'
 
-async function jax () {
+async function jax() {
   await new JaxDataImporter().import()
 }
 
