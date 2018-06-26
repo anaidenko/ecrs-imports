@@ -28,7 +28,7 @@ export default class JaxDataReader {
         metadata: {
           fileName: xmlFile.name
         }
-      } as api.ImportPayload
+      }
       return payload
     } finally {
       await this.ftpManager.disconnect()
@@ -41,7 +41,10 @@ export default class JaxDataReader {
     let xmlFiles = await this.ftpManager.list(dirpath, '*.xml')
     if (xmlFiles.length === 0) throw new Error('files not found')
 
-    let lastXmlFile = _.maxBy(xmlFiles, file => Number(file.name.substr(0, file.name.length - file.ext.length)) || file.date.getTime()) as FtpFileInfo
+    let lastXmlFile = _.maxBy(
+      xmlFiles,
+      file => Number(file.name.substr(0, file.name.length - file.ext.length)) || file.date.getTime()
+    ) as FtpFileInfo
     return lastXmlFile
   }
 

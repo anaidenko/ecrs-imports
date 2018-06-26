@@ -15,7 +15,9 @@ export const DebugRedis: boolean = process.env['DEBUG_REDIS'] === 'true'
 
 export const CronImportInterval: string = process.env['CRON_IMPORT_INTERVAL'] || ''
 export const CronCheckInterval: string = process.env['CRON_CHECK_INTERVAL'] || ''
-export const CronCheckNoUpdatesDuration: moment.Duration = moment.duration(process.env['CRON_CHECK_NO_UPDATES_FOR'] || '24:00')
+export const CronCheckNoUpdatesDuration: moment.Duration = moment.duration(
+  process.env['CRON_CHECK_NO_UPDATES_FOR'] || '24:00'
+)
 
 export const ApiBaseUrl: string = process.env['API_SELLR_BASE'] || 'http://apidev.sllr.io'
 export const ApiAuthUrl: string = process.env['API_AUTH_URL'] || '/session'

@@ -14,7 +14,12 @@ export default class RetryPolicy {
     return this.start(fn, 1, ++taskCounter, description)
   }
 
-  private async start<T = any>(fn: () => Promise<T>, attempt: number, taskId: number, description?: string): Promise<T> {
+  private async start<T = any>(
+    fn: () => Promise<T>,
+    attempt: number,
+    taskId: number,
+    description?: string
+  ): Promise<T> {
     let taskIdPrefix = `[${taskId}]`
     try {
       return await fn()

@@ -30,7 +30,7 @@ export default class JaxDataImporter {
       let storeCumming: api.Store = { ...account, storeId: 284 }
       let storeBraselton: api.Store = { ...account, storeId: 656 }
 
-      let data = (await this.retry.operation(() => new JaxDataReader(config.FtpSettings).read(), 'download xml file')) as api.ImportPayload
+      let data = await this.retry.operation(() => new JaxDataReader(config.FtpSettings).read(), 'download xml file')
       if (!data || !data.items || data.items.length === 0) return 0 // not found
 
       await this.api.login()
@@ -45,7 +45,10 @@ export default class JaxDataImporter {
       //   this.retry.operation(() => Promise.reject('fake error for braselton store'), 'submit to JAX Braselton store')
       // ])
 
-      await everyPromise([this.submitUpdates(storeCumming, storeCummingPayload), this.submitUpdates(storeBraselton, storeBraseltonPayload)])
+      await everyPromise([
+        this.submitUpdates(storeCumming, storeCummingPayload),
+        this.submitUpdates(storeBraselton, storeBraseltonPayload)
+      ])
 
       await this.saveImport(data)
 
@@ -117,7 +120,10 @@ export default class JaxDataImporter {
   }
 
   private async getLatestImport() {
-    let [filename, timestamp] = await Promise.all([this.redis.getAsync('latestImport.filename'), this.redis.getAsync('latestImport.timestamp')])
+    let [filename, timestamp] = await Promise.all([
+      this.redis.getAsync('latestImport.filename'),
+      this.redis.getAsync('latestImport.timestamp')
+    ])
     if (!timestamp) return undefined
     timestamp = moment(timestamp)
     return { filename, timestamp }

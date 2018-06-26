@@ -42,11 +42,11 @@ export class Client {
 
   async fetchStoreProducts(store: api.Store): Promise<api.StoreProduct[]> {
     const storeInfo = `storeId=${store.storeId}, accountId=${store.accountId}`
-    logger.log(`fetching jax items from store api... ${storeInfo}`)
+    logger.log(`fetching store products from sellr api... ${storeInfo}`)
     let url = config.ApiFetchUrl + '?id=' + store.storeId
     let response = await this.api.get<api.StoreProduct[]>(url)
     let products = response.data || []
-    logger.debug(`Received ${products.length} products`)
+    logger.debug(`Received ${products.length} products ${storeInfo}`)
     return products
   }
 }
