@@ -12,6 +12,7 @@ export const Timezone: string = process.env['TZ'] || 'America/New_York'
 export const Debug: boolean = process.env['DEBUG'] === 'true'
 export const DebugSingleItem: boolean = process.env['DEBUG_SINGLE_ITEM'] === 'true'
 export const DebugRedis: boolean = process.env['DEBUG_REDIS'] === 'true'
+export const UnlistOutOfStock: boolean = process.env['UNLIST_OUT_OF_STOCK'] !== 'false'
 
 export const CronImportInterval: string = process.env['CRON_IMPORT_INTERVAL'] || ''
 export const CronCheckInterval: string = process.env['CRON_CHECK_INTERVAL'] || ''
@@ -22,7 +23,7 @@ export const CronCheckNoUpdatesDuration: moment.Duration = moment.duration(
 export const ApiBaseUrl: string = process.env['API_SELLR_BASE'] || 'http://apidev.sllr.io'
 export const ApiAuthUrl: string = process.env['API_AUTH_URL'] || '/session'
 export const ApiImportUrl: string = process.env['API_IMPORT_URL'] || '/api/import'
-export const ApiFetchUrl: string = process.env['API_FETCH_URL'] || '/storedb/stores/products'
+export const ApiFetchUrl: string = process.env['API_FETCH_URL'] || '/search/query'
 
 export const ApiCredentials = {
   email: process.env['API_EMAIL'],

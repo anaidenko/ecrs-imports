@@ -43,10 +43,26 @@ export class Client {
   async fetchStoreProducts(store: api.Store): Promise<api.StoreProduct[]> {
     const storeInfo = `storeId=${store.storeId}, accountId=${store.accountId}`
     logger.log(`fetching store products from sellr api... ${storeInfo}`)
-    let url = config.ApiFetchUrl + '?id=' + store.storeId
-    let response = await this.api.get<api.StoreProduct[]>(url)
-    let products = response.data || []
-    logger.debug(`Received ${products.length} products ${storeInfo}`)
+    let products = await this.fetchStoreProductsRecursively(store)
+    logger.debug(`Received ${products.length} products for ${storeInfo}`)
+    return products
+  }
+
+  private async fetchStoreProductsRecursively(
+    store: api.Store,
+    page: number = 0,
+    limit: number = 1000
+  ): Promise<api.StoreProduct[]> {
+    let url = config.ApiFetchUrl + `/${store.storeId}?page=${page}&limit=${limit}`
+    let response = await this.api.get<api.SearchResponse>(url)
+    let products = response.data.hits || []
+
+    // if limit reached, fetch more products...
+    if (products.length >= limit) {
+      let moreProducts = await this.fetchStoreProductsRecursively(store, page + 1, limit)
+      return products.concat(moreProducts)
+    }
+
     return products
   }
 }

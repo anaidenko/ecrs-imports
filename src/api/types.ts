@@ -27,12 +27,13 @@ export interface Store {
   storeId?: number
 }
 
+export interface SearchResponse {
+  hits: StoreProduct[]
+}
+
 export interface StoreProduct {
-  accountId?: number
-  storeId: number
   upc: string
-  productId: string
-  status: string
-  productTypeId: number
-  source?: string
+  name: string
+  productId: number
+  visibility: string
 }

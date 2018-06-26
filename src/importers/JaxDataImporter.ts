@@ -9,7 +9,7 @@ import logger from '../core/logger'
 import { RedisClient, createRedisClient } from '../core/redis'
 import RetryPolicy from '../core/RetryPolicy'
 import AggregateError from '../core/AggregateError'
-import { everyPromise } from '../core/promise-extra'
+import { everyPromiseOneByOne } from '../core/promise-extra'
 
 export default class JaxDataImporter {
   private api: api.Client
@@ -36,18 +36,23 @@ export default class JaxDataImporter {
       await this.api.login()
 
       // run imports in parallel
-      logger.debug('starting imports...')
+      logger.debug(`starting imports to ${config.ApiBaseUrl}...`)
       let storeCummingPayload = this.preparePayload(storeCumming, data)
       let storeBraseltonPayload = this.preparePayload(storeBraselton, data)
 
-      // await everyPromise([
+      // await everyPromiseInParallel([
       //   this.retry.operation(() => Promise.reject('fake error for cumming store'), 'submit to JAX Cumming store'),
       //   this.retry.operation(() => Promise.reject('fake error for braselton store'), 'submit to JAX Braselton store')
       // ])
 
-      await everyPromise([
-        this.submitUpdates(storeCumming, storeCummingPayload),
-        this.submitUpdates(storeBraselton, storeBraseltonPayload)
+      // await everyPromiseInParallel([
+      //   this.submitUpdates(storeCumming, storeCummingPayload),
+      //   this.submitUpdates(storeBraselton, storeBraseltonPayload)
+      // ])
+
+      await everyPromiseOneByOne([
+        () => this.submitUpdates(storeCumming, storeCummingPayload),
+        () => this.submitUpdates(storeBraselton, storeBraseltonPayload)
       ])
 
       await this.saveImport(data)
@@ -104,11 +109,19 @@ export default class JaxDataImporter {
     _.each(existingProducts, existing => {
       let importProduct = _.find(importProducts, { upc: existing.upc }) as api.ECRSImportItem
       if (importProduct) {
-        importProduct.status = existing.status || importProduct.status // preserve product status from sellr store
+        importProduct.status = existing.visibility // listed|unlisted|featured
       }
     })
-    _.each(importProducts, product => {
-      product.status = product.status || 'listed' // by default
+
+    _.each(importProducts, importProduct => {
+      importProduct.status = importProduct.status || 'unlisted' // by default
+
+      if (config.UnlistOutOfStock) {
+        let inventory = Number(importProduct.inventory)
+        if (isNaN(inventory) || inventory <= 0) {
+          importProduct.status = 'unlisted'
+        }
+      }
     })
   }
 
