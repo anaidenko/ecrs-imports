@@ -114,7 +114,7 @@ export default class JaxDataImporter {
     })
 
     _.each(importProducts, importProduct => {
-      importProduct.status = importProduct.status || 'unlisted' // by default
+      importProduct.status = importProduct.status || 'listed' // by default
 
       if (config.UnlistOutOfStock) {
         let inventory = Number(importProduct.inventory)
