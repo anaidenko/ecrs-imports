@@ -1,37 +1,41 @@
 import { CronJob } from 'cron'
+
+import { toImporter } from './api/clientImporter'
+import { Jax } from './clients'
 import * as config from './config'
-import logger from './core/logger'
-import JaxDataImporter from './importers/JaxDataImporter'
+import { logger } from './utils/logger'
 
-let importJob: CronJob | undefined
-let checkJob: CronJob | undefined
+let jaxImportJob: CronJob | undefined
+let jaxCheckJob: CronJob | undefined
 
-if (config.CronImportInterval) {
-  logger.log(`Starting import timer via cron: ${config.CronImportInterval}`)
+const JaxImporter = toImporter(Jax)
 
-  importJob = new CronJob({
-    cronTime: config.CronImportInterval,
+if (config.JaxCronImportInterval) {
+  logger.log(`Starting jax import timer via cron: ${config.JaxCronImportInterval}`)
+
+  jaxImportJob = new CronJob({
+    cronTime: config.JaxCronImportInterval,
     onTick: async () => {
-      logger.log(`Starting scheduled jax importer on timer... ${config.CronImportInterval}`)
-      return new JaxDataImporter().import().catch(() => 0)
+      logger.log(`Starting scheduled jax importer on timer... ${config.JaxCronImportInterval}`)
+      await JaxImporter.import().catch(() => 0)
     },
     start: true,
     timeZone: config.Timezone
   })
 }
 
-if (config.CronCheckInterval) {
-  logger.log(`Starting check for updates timer via cron: ${config.CronCheckInterval}`)
+if (config.JaxCronCheckInterval) {
+  logger.log(`Starting timer to check for updates from jax via cron: ${config.JaxCronCheckInterval}`)
 
-  checkJob = new CronJob({
-    cronTime: config.CronCheckInterval,
+  jaxCheckJob = new CronJob({
+    cronTime: config.JaxCronCheckInterval,
     onTick: async () => {
-      logger.log('Checking for updates...')
-      await new JaxDataImporter().checkForUpdates().catch(() => 0)
+      logger.log('Checking for updates from jax...')
+      await JaxImporter.checkForUpdates().catch(() => 0)
     },
     start: true,
     timeZone: config.Timezone
   })
 }
 
-export default { importJob, checkJob }
+export { jaxImportJob, jaxCheckJob }

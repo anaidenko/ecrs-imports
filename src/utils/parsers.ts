@@ -1,5 +1,6 @@
 import xml2js = require('xml2js')
-import logger from './logger'
+
+import { logger } from './logger'
 
 export async function parseXml(content: string): Promise<any> {
   return new Promise((resolve: (result: string) => void, reject: (err: Error) => void) => {

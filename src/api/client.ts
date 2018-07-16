@@ -1,9 +1,12 @@
 import axios, { AxiosInstance } from 'axios'
+import { injectable } from 'inversify'
 
-import * as api from './index'
 import * as config from '../config'
-import logger from '../core/logger'
+import { logger } from '../utils/logger'
 
+import * as api from '.'
+
+@injectable()
 export class Client {
   private api: AxiosInstance
 

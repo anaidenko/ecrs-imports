@@ -1,10 +1,13 @@
 import * as FtpClient from 'ftp'
+import ReadableStream = NodeJS.ReadableStream
+import { inject, injectable } from 'inversify'
 import * as minimatch from 'minimatch'
 import * as path from 'path'
 import streamToString = require('stream-to-string')
 
-import logger from './logger'
-import ReadableStream = NodeJS.ReadableStream
+import { TYPES } from '../config/types'
+
+import { logger } from '../utils/logger'
 
 export interface FtpOptions extends FtpClient.Options {
   root?: string
@@ -18,13 +21,14 @@ export interface FileInfo extends FtpClient.ListingElement {
   path: string
 }
 
+@injectable()
 export class FtpManager {
   private static lastId: number = 0
 
   private client: FtpClient
   private _id: number
 
-  constructor(private options: FtpOptions) {
+  constructor(@inject(TYPES.FtpOptions) public options: FtpOptions) {
     this._id = ++FtpManager.lastId
     this.client = new FtpClient()
     this.client.on('error', err => logger.error(this.id, 'Error', err))

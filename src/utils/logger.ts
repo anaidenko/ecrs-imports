@@ -1,11 +1,12 @@
-import * as winston from 'winston'
-import * as config from '../config'
 import fs = require('fs-extra')
+import * as winston from 'winston'
+
+import * as config from '../config'
 
 fs.ensureDirSync('./logs')
 
 const mb = 1024 * 1024
-const logger = new winston.Logger({
+const wlogger = new winston.Logger({
   level: config.Env === 'development' || config.Debug ? 'debug' : 'info',
   transports: [
     new winston.transports.Console({ colorize: 'level', prettyPrint: jsonObjects, handleExceptions: true }),
@@ -35,20 +36,20 @@ function jsonObjects(obj: any): string {
 
 class Logger {
   log(message: any, ...params: any[]) {
-    logger.log('info', message, ...params)
+    wlogger.log('info', message, ...params)
   }
 
   warn(message: any, ...params: any[]) {
-    logger.log('warn', message, ...params)
+    wlogger.log('warn', message, ...params)
   }
 
   error(message: any, ...params: any[]) {
-    logger.log('error', message, ...params)
+    wlogger.log('error', message, ...params)
   }
 
   debug(message: any, ...params: any[]) {
-    logger.log('debug', message, ...params)
+    wlogger.log('debug', message, ...params)
   }
 }
 
-export default new Logger()
+export const logger = new Logger()

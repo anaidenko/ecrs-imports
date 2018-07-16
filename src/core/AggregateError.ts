@@ -1,4 +1,4 @@
-export default class AggregateError extends Error {
+export class AggregateError extends Error {
   readonly errors: Error[]
 
   constructor(errors: Error[], message?: string) {

@@ -13,9 +13,12 @@
     "start:clock": "node build/clock.js",
     "start:web": "node build/web/server.js",
     "lint": "tslint --project tsconfig.json",
+    "lint-fix": "tslint --project tsconfig.json --fix",
     "format-check": "prettier --config ./.prettierrc --list-different \"src/**/*{.ts,.js,.json,.css,.scss}\"",
-    "format-fix": "pretty-quick --staged",
-    "precommit": "npm run format-fix"
+    "format-fix": "pretty-quick",
+    "format-fix-staged": "pretty-quick --staged",
+    "fix": "concurrently \"npm run format-fix\" \"npm run lint-fix\"",
+    "precommit": "npm run format-fix-staged"
   },
   "engines": {
     "node": "8.9.4"
@@ -47,6 +50,7 @@
     "@types/winston": "^2.3.9",
     "bower": "^1.8.4",
     "cli-clear": "^1.0.4",
+    "concurrently": "^3.6.0",
     "del": "^3.0.0",
     "dotenv": "^6.0.0",
     "expect.js": "^0.3.1",
@@ -66,7 +70,7 @@
     "karma-phantomjs-launcher": "^1.0.4",
     "karma-typescript": "^3.0.12",
     "mocha": "^5.2.0",
-    "prettier": "^1.13.6",
+    "prettier": "^1.13.7",
     "pretty-quick": "^1.6.0",
     "run-sequence": "^2.2.1",
     "strip-json-comments": "^2.0.1",
@@ -85,11 +89,13 @@
     "fs-extra": "^6.0.1",
     "ftp": "^0.3.10",
     "http": "0.0.0",
+    "inversify": "^4.13.0",
     "lodash": "^4.17.10",
     "minimatch": "^3.0.4",
     "moment": "^2.22.2",
     "morgan": "^1.9.0",
     "redis": "^2.8.0",
+    "reflect-metadata": "^0.1.12",
     "stream-to-string": "^1.1.0",
     "winston": "^2.4.2",
     "xml2js": "^0.4.19"

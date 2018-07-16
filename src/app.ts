@@ -1,7 +1,10 @@
-import JaxDataImporter from './importers/JaxDataImporter'
+import { importClients } from './api/clientImporter'
+import { All } from './clients'
+import { disposeContainer } from './config/ioc'
 
-async function jax() {
-  await new JaxDataImporter().import()
+async function run() {
+  await importClients(All)
+  await disposeContainer() // release resources before app exit
 }
 
-jax().catch(() => 0)
+run().catch(() => 0)

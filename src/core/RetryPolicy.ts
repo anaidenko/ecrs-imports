@@ -1,8 +1,11 @@
-import logger from './logger'
+import { injectable } from 'inversify'
+
+import { logger } from '../utils/logger'
 
 let taskCounter = 0 // for logging purposes
 
-export default class RetryPolicy {
+@injectable()
+export class RetryPolicy {
   private delayGenerator: (attempt: number) => number
 
   constructor(private tries: number) {

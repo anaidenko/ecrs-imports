@@ -1,4 +1,4 @@
-import AggregateError from './AggregateError'
+import { AggregateError } from '../core/AggregateError'
 
 /**
  * Avoiding Promise.all() fail-fast behavior, make sure all the promises are eventually executed.

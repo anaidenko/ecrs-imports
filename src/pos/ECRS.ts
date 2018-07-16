@@ -1,19 +1,21 @@
-import * as path from 'path'
+import { injectable } from 'inversify'
 import * as _ from 'lodash'
+import * as path from 'path'
 
 import * as api from '../api/types'
-import logger from '../core/logger'
-import { FtpManager, FtpOptions, FileInfo as FtpFileInfo } from '../core/FtpManager'
-import { parseXml } from '../core/parsers'
+import { FileInfo as FtpFileInfo, FtpManager } from '../core/FtpManager'
+import { logger } from '../utils/logger'
+import { parseXml } from '../utils/parsers'
 
-export default class JaxDataReader {
-  private ftpManager: FtpManager
+import { IDataReader } from '../interfaces/IDataReader'
 
-  constructor(private ftpOptions: FtpOptions) {
-    this.ftpManager = new FtpManager(ftpOptions)
-  }
+export const TYPE = Symbol('ECRS')
 
-  async read(): Promise<api.ImportPayload | undefined> {
+@injectable()
+export class ECRS implements IDataReader {
+  constructor(private ftpManager: FtpManager) {}
+
+  async readData(): Promise<api.ImportPayload | undefined> {
     await this.ftpManager.connect()
     try {
       let xmlFile = await this.lookupXmlFile()
@@ -36,7 +38,7 @@ export default class JaxDataReader {
   }
 
   private async lookupXmlFile(): Promise<FtpFileInfo> {
-    let dirpath = path.join(this.ftpOptions.root || '/', '/items')
+    let dirpath = path.join(this.ftpManager.options.root || '/', '/items')
 
     let xmlFiles = await this.ftpManager.list(dirpath, '*.xml')
     if (xmlFiles.length === 0) throw new Error('files not found')
@@ -48,7 +50,7 @@ export default class JaxDataReader {
     return lastXmlFile
   }
 
-  private async readItems(xmlFilePath: string): Promise<api.ECRSImportItem[]> {
+  private async readItems(xmlFilePath: string): Promise<api.ImportItem[]> {
     let content = await this.ftpManager.getContent(xmlFilePath)
     let data = await parseXml(content)
     logger.debug('mapping jax->sellr items...')
@@ -56,10 +58,10 @@ export default class JaxDataReader {
     return items
   }
 
-  private mapItem(data: any): api.ECRSImportItem {
+  private mapItem(data: any): api.ImportItem {
     let price: string = data.Pricing[0].Price[0].$.price
 
-    let item: api.ECRSImportItem = {
+    let item: api.ImportItem = {
       upc: data.$.scancode,
       name: (data.Name || [])[0],
       inventory: (data.OnHand || [])[0],

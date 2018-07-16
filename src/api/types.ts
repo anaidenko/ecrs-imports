@@ -8,9 +8,7 @@ export interface ImportPayload {
   }
 }
 
-export type ImportItem = ECRSImportItem
-
-export type ECRSImportItem = {
+export type ImportItem = {
   upc: string
   name: string
   description?: string

@@ -2,5 +2,17 @@
   "extends": [
     "tslint-config-standard",
     "tslint-config-prettier"
-  ]
+  ],
+  "rules": {
+    "ordered-imports": [
+      true,
+      {
+        "grouped-imports": true,
+        "import-sources-order": "lowercase-last",
+        "named-imports-order": "lowercase-first",
+        "module-source-path": "full"
+      }
+    ],
+    "no-unused-variable": true
+  }
 }
