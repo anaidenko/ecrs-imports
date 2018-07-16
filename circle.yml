@@ -5,12 +5,12 @@ deployment:
   staging:
     branch: staging
     heroku:
-      appname: ecrs-imports-staging
+      appname: pos-imports-staging
   develop:
     branch: develop
     heroku:
-      appname: ecrs-imports-dev
+      appname: pos-imports-dev
   master:
     branch: master
     heroku:
-      appname: ecrs-imports
+      appname: pos-imports
