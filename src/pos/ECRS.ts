@@ -53,7 +53,7 @@ export class ECRS implements IDataReader {
   private async readItems(xmlFilePath: string): Promise<api.ImportItem[]> {
     let content = await this.ftpManager.getContent(xmlFilePath)
     let data = await parseXml(content)
-    logger.debug('mapping jax->sellr items...')
+    logger.debug('mapping ecrs->sellr items...')
     let items = data.Items.Item.map(data => this.mapItem(data))
     return items
   }

@@ -1,4 +1,5 @@
 import PromiseRouter from 'express-promise-router'
+import * as slug from 'slug'
 
 import { importClients } from '../api/clientImporter'
 import { All } from '../clients'
@@ -14,10 +15,10 @@ routes.route('/import').all(async (req, res) => {
   }
 })
 
-routes.route('/import/:client').all(async (req, res) => {
+routes.route('/import/:clientSlug').all(async (req, res) => {
   try {
-    const clientParam = req.params.client.toLowerCase()
-    const clientRequested = All.find(client => client.name.toLowerCase() === clientParam)
+    const clientSlug = req.params.clientSlug.toLowerCase()
+    const clientRequested = All.find(client => slug(client.name) === clientSlug)
     if (!clientRequested) return res.status(404).send('Client not found')
     await importClients([clientRequested])
     res.send(`${clientRequested.name} import completed on ${new Date()}`)

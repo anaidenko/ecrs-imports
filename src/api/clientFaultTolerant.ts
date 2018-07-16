@@ -12,14 +12,14 @@ export class ClientFaultTolerant extends Client {
   }
 
   async login() {
-    return this.retry.operation(() => super.login())
+    return this.retry.operation(() => super.login(), 'api.login')
   }
 
   async submitItems(payload: api.ImportPayload): Promise<number> {
-    return this.retry.operation(() => super.submitItems(payload))
+    return this.retry.operation(() => super.submitItems(payload), 'api.submitItems')
   }
 
   async fetchStoreProducts(store: api.Store): Promise<api.StoreProduct[]> {
-    return this.retry.operation(() => super.fetchStoreProducts(store))
+    return this.retry.operation(() => super.fetchStoreProducts(store), 'api.fetchStoreProducts')
   }
 }

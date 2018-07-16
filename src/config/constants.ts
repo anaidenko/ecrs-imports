@@ -12,6 +12,7 @@ export const Timezone: string = process.env['TZ'] || 'America/New_York'
 export const Debug: boolean = process.env['DEBUG'] === 'true'
 export const DebugSingleItem: boolean = process.env['DEBUG_SINGLE_ITEM'] === 'true'
 export const DebugRedis: boolean = process.env['DEBUG_REDIS'] === 'true'
+export const DebugClient: string = process.env['DEBUG_CLIENT'] || ''
 export const UnlistOutOfStock: boolean = process.env['UNLIST_OUT_OF_STOCK'] !== 'false'
 
 export const ApiBaseUrl: string = process.env['API_SELLR_BASE'] || 'http://apidev.sllr.io'

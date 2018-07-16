@@ -12,18 +12,18 @@ export class FtpManagerFaultTolerant extends FtpManager {
   }
 
   async connect(): Promise<void> {
-    return this.retry.operation(() => super.connect())
+    return this.retry.operation(() => super.connect(), 'ftp.connect')
   }
 
   async disconnect(force: boolean = false): Promise<void> {
-    return this.retry.operation(() => super.disconnect(force))
+    return this.retry.operation(() => super.disconnect(force), 'ftp.disconnect')
   }
 
   async list(path: string, pattern?: string): Promise<FileInfo[]> {
-    return this.retry.operation(() => super.list(path, pattern))
+    return this.retry.operation(() => super.list(path, pattern), 'ftp.list')
   }
 
   async getContent(filepath: string): Promise<string> {
-    return this.retry.operation(() => super.getContent(filepath))
+    return this.retry.operation(() => super.getContent(filepath), 'ftp.getContent')
   }
 }

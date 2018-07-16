@@ -36,7 +36,7 @@ export class RetryPolicy {
         let nextAttempt = attempt + 1
         logger.log(taskIdPrefix, `retry scheduled in ${retryDelay}ms...`)
         await this.delay(retryDelay)
-        logger.log(taskIdPrefix, `retrying... attempt #${nextAttempt} to ${description}`)
+        logger.log(taskIdPrefix, `retrying... attempt #${nextAttempt}`, description ? `to ${description}` : '')
         return this.start<T>(fn, nextAttempt, taskId, description)
       } else {
         throw err // reject

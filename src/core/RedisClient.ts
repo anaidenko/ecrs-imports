@@ -24,7 +24,7 @@ export function createRedisClient(): RedisClient {
 
 export function createFaultTolerantRedisClient(retry: RetryPolicy): RedisClient {
   const retryHandler = {
-    apply: (target, self, args) => retry.operation(() => target.apply(self, ...args))
+    apply: (target, self, args) => retry.operation(() => target.apply(self, ...args), 'redis.command')
   }
 
   const client = createRedisClient()

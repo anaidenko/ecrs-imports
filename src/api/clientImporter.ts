@@ -1,6 +1,6 @@
 import { injectable } from 'inversify'
 
-import { container } from '../config/ioc'
+import { container } from '../core/container'
 import { StoreDataImporter } from '../core/StoreDataImporter'
 import { IClientSettings, IDataReader } from '../interfaces'
 import { logger } from '../utils/logger'
@@ -45,10 +45,6 @@ export function toImporter(client: IClientSettings) {
 }
 
 export async function importClients(clients: IClientSettings[]) {
-  try {
-    const importTasks = clients.map(toImporter).map(x => () => x.import())
-    await everyPromiseOneByOne(importTasks)
-  } catch (err) {
-    console.error('Internal Error', err)
-  }
+  const importTasks = clients.map(toImporter).map(x => () => x.import())
+  await everyPromiseOneByOne(importTasks)
 }
