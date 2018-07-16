@@ -42,3 +42,10 @@ export const JaxCronCheckInterval: string = process.env['JAX_CRON_CHECK_INTERVAL
 export const JaxCronCheckNoUpdatesDuration: moment.Duration = moment.duration(
   process.env['JAX_CRON_CHECK_NO_UPDATES_FOR'] || '24:00'
 )
+
+// Caesars Settings
+export const CaesarsCronImportInterval: string = process.env['CAESARS_CRON_IMPORT_INTERVAL'] || ''
+export const CaesarsCronCheckInterval: string = process.env['CAESARS_CRON_CHECK_INTERVAL'] || ''
+export const CaesarsCronCheckNoUpdatesDuration: moment.Duration = moment.duration(
+  process.env['CAESARS_CRON_CHECK_NO_UPDATES_FOR'] || '24:00'
+)
